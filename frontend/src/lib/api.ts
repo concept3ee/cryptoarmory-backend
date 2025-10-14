@@ -21,6 +21,7 @@ const defaultConfig: Required<ApiConfig> = {
   baseUrl: (import.meta as any).env?.VITE_API_BASE_URL ?? 'http://localhost:4000',
   authToken: ''
 };
+// Updated API configuration for production deployment
 
 export function createApi(config: ApiConfig = {}) {
   const cfg: Required<ApiConfig> = { ...defaultConfig, ...config } as Required<ApiConfig>;
