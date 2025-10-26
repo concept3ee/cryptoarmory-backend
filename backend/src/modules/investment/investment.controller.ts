@@ -53,7 +53,7 @@ export class InvestmentController {
 
   @Post(':id/proof')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadProof(@Param('id') id: string, @UploadedFile() file?: Express.Multer.File) {
+  async uploadProof(@Param('id') id: string, @UploadedFile() file?: any) {
     // In a real app, upload to S3; here we store a base64 data URL
     const dataUrl = file ? `data:${file.mimetype};base64,${file.buffer.toString('base64')}` : undefined;
     return this.service.attachProof(id, dataUrl);
