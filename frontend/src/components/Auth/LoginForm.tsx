@@ -25,7 +25,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
     try {
       const success = await login(email, password);
       if (success) {
-        addNotification({ title: 'Welcome back', message: 'Login successful', type: 'success' });
+        addNotification({ title: 'Login successful', message: 'Welcome to CryptoArmory', type: 'success' });
         setRedirecting(true);
         setTimeout(() => navigate('/dashboard'), 700);
       }

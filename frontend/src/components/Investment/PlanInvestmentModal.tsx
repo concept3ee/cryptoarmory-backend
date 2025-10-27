@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, DollarSign, Copy, Check, UploadCloud } from 'lucide-react';
 import { createApi } from '../../lib/api';
+import QRCode from '../Common/QRCode';
 
 interface Plan {
   id: string;
@@ -92,20 +93,55 @@ const PlanInvestmentModal: React.FC<PlanInvestmentModalProps> = ({ isOpen, plan,
             <div className="space-y-6">
               <div className="text-center">
                 <h3 className="mb-2 text-lg font-semibold text-white">Payment Instructions</h3>
-                <p className="text-gray-400">Send ${numericAmount} to the wallet address below</p>
+                <p className="text-gray-400">Send ${numericAmount} to the Bitcoin address below</p>
               </div>
 
+              {/* Bitcoin Address */}
               <div className="rounded-xl bg-gray-700/50 p-4">
                 <div className="mb-2 flex items-center justify-between">
-                  <label className="text-sm font-medium text-gray-300">Wallet Address</label>
+                  <label className="text-sm font-medium text-gray-300">Bitcoin Address</label>
                   <button
-                    onClick={async () => { await navigator.clipboard.writeText(walletUrl); setCopied(true); setTimeout(() => setCopied(false), 1500); }}
+                    onClick={async () => { 
+                      await navigator.clipboard.writeText('bc1quncrdcf7c2m77vmnrjgfyyv2ppljvu6wqr0t2p'); 
+                      setCopied(true); 
+                      setTimeout(() => setCopied(false), 1500); 
+                    }}
                     className="text-purple-400 transition-colors hover:text-purple-300"
                   >
                     {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                   </button>
                 </div>
-                <p className="break-all rounded-lg bg-gray-800 p-3 font-mono text-sm text-white">{walletUrl}</p>
+                <p className="break-all rounded-lg bg-gray-800 p-3 font-mono text-sm text-white">bc1quncrdcf7c2m77vmnrjgfyyv2ppljvu6wqr0t2p</p>
+              </div>
+
+              {/* QR Code */}
+              <div className="rounded-xl bg-gray-700/50 p-4">
+                <div className="text-center">
+                  <label className="text-sm font-medium text-gray-300 mb-4 block">Scan QR Code</label>
+                  <QRCode 
+                    value="bc1quncrdcf7c2m77vmnrjgfyyv2ppljvu6wqr0t2p" 
+                    size={200}
+                    className="mx-auto"
+                  />
+                </div>
+              </div>
+
+              {/* Trust Wallet Link */}
+              <div className="rounded-xl bg-gray-700/50 p-4">
+                <div className="mb-2 flex items-center justify-between">
+                  <label className="text-sm font-medium text-gray-300">Trust Wallet Link</label>
+                  <button
+                    onClick={async () => { 
+                      await navigator.clipboard.writeText('link.trustwallet.com/send?address=bc1quncrdcf7c2m77vmnrjgfyyv2ppljvu6wqr0t2p&asset=c0'); 
+                      setCopied(true); 
+                      setTimeout(() => setCopied(false), 1500); 
+                    }}
+                    className="text-purple-400 transition-colors hover:text-purple-300"
+                  >
+                    {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                  </button>
+                </div>
+                <p className="break-all rounded-lg bg-gray-800 p-3 font-mono text-sm text-white">link.trustwallet.com/send?address=bc1quncrdcf7c2m77vmnrjgfyyv2ppljvu6wqr0t2p&asset=c0</p>
               </div>
 
               <div className="rounded-xl border border-yellow-500/30 bg-yellow-900/30 p-4 text-yellow-300">
@@ -117,12 +153,15 @@ const PlanInvestmentModal: React.FC<PlanInvestmentModalProps> = ({ isOpen, plan,
               </div>
 
               <div className="space-y-3">
-                <label className="block text-sm font-medium text-gray-300">Upload proof of payment (screenshot/receipt)</label>
+                <label className="block text-sm font-medium text-gray-300">Upload proof of payment (screenshot/receipt) - Optional</label>
                 <input type="file" accept="image/*,.pdf" onChange={e=>setProof(e.target.files?.[0] || null)} className="w-full text-sm text-gray-300" />
                 <button
-                  disabled={!proof || submitting}
+                  disabled={submitting}
                   onClick={async ()=>{
-                    if (!proof) return;
+                    if (!proof) {
+                      setStep('success');
+                      return;
+                    }
                     setSubmitting(true);
                     try {
                       if (!investmentId) return;
@@ -131,12 +170,13 @@ const PlanInvestmentModal: React.FC<PlanInvestmentModalProps> = ({ isOpen, plan,
                       const form = new FormData();
                       form.append('file', proof);
                       await fetch(`${apiBase}/api/investments/${investmentId}/proof`, { method: 'POST', headers: token ? { Authorization: `Bearer ${token}` } as any : undefined, body: form } as any);
+                      setStep('success');
                     } finally { setSubmitting(false); }
                   }}
                   className="inline-flex items-center space-x-2 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 px-4 py-3 font-semibold text-white hover:from-purple-700 hover:to-blue-700 disabled:opacity-50"
                 >
                   <UploadCloud className="h-4 w-4" />
-                  <span>{submitting ? 'Uploading…' : 'Upload Proof'}</span>
+                  <span>{submitting ? 'Uploading…' : proof ? 'Upload Proof' : 'Skip Upload'}</span>
                 </button>
 
                 <button

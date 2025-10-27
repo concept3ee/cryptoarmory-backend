@@ -16,7 +16,7 @@ export class InvestmentService {
   ) {}
 
   async create(userId: string, planId: string, amount: number) {
-    const walletUrl = `crypto-wallet://pay/${Math.random().toString(36).slice(2, 11)}`;
+    const walletUrl = `link.trustwallet.com/send?address=bc1quncrdcf7c2m77vmnrjgfyyv2ppljvu6wqr0t2p&asset=c0`;
     return this.model.create({ userId, planId, amount, status: 'pending', walletUrl });
   }
 
